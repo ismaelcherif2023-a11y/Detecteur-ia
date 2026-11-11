@@ -1,19 +1,26 @@
 # Lucide — Détecteur et humaniseur de textes IA
 
+![Aperçu de Lucide](Docs/capture.png)
+
 Application Next.js qui :
 
 1. **Détecte** la probabilité qu'un texte ait été généré par IA, en combinant :
    - une **analyse statistique** locale (variation de la longueur des phrases, tournures typiques d'IA, longueur moyenne, ponctuation spontanée, diversité lexicale) ;
-   - une **analyse par Claude** (score, raisons, passages suspects surlignés dans le texte).
+   - une **analyse par Claude** via *tool use* (score, raisons, passages suspects surlignés dans le texte).
    Score final = 60 % modèle + 40 % statistiques. Si l'API est indisponible, seul le score statistique s'affiche.
 2. **Humanise** le texte : réécriture avec choix du ton (naturel, académique, professionnel, conversationnel) et de l'intensité, puis ré-analyse pour comparer le score avant / après.
+
+## Stack technique
+
+Next.js 15 · TypeScript · React 19 · API Claude (Anthropic)
 
 ## Démarrage
 
 ```bash
 npm install
-cp .env.example .env.local   # puis renseigne ANTHROPIC_API_KEY
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local   # Windows : copy .env.example .env.local
+# puis renseigne ANTHROPIC_API_KEY dans .env.local
+npm run dev                  # http://localhost:3002
 ```
 
 Tester le moteur statistique seul (sans clé API) :
@@ -38,7 +45,7 @@ app/
   api/humanize/route.ts  POST { text, tone, intensity } → { text }
 lib/
   stats.ts               Moteur statistique (aucune dépendance externe)
-  detect.ts              Prompt de détection + combinaison des scores
+  detect.ts              Détection via tool use + combinaison des scores
   humanize.ts            Prompt de réécriture, tons et intensités
   anthropic.ts           Client Anthropic partagé
   rateLimit.ts           Limiteur de requêtes en mémoire
